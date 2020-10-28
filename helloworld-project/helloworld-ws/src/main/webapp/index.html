@@ -3,7 +3,6 @@
     Copyright 2015, Red Hat, Inc. and/or its affiliates, and individual
     contributors by the @authors tag. See the copyright.txt in the
     distribution for a full listing of individual contributors.
-
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
@@ -15,25 +14,41 @@
     limitations under the License.
 -->
 <html>
-    <head><title>helloworld-ws Quickstart</title></head>
+  <head>
+    <title>helloworld-ws Quickstart</title>
+    <style>
+        #panel, .flip {
+          font-size: 24px;
+          padding: 10px;
+          text-align: center;
+          background-color: #00BFFF;
+          color: white;
+          border: solid 1px #6495ED;
+          margin: auto;
+        }
+        #panel {
+          display: none;
+        }
+    </style>
+  </head>
+    
+  <body>
+    <h1><p style="text-align: center">Helloworld from Iryna Zaitsava!</p></h1>
+    <h3><p style="text-align: center">Hello! This is my app that I up by Jenkins and Kubernetis.</p></h3>
+    <p style="text-align: center">To make sure that the application is really changing I suggest you look at sha sum.</p>
+    <p class="flip" onclick="myFunction()">Push to check</p>
 
-    <body>
+    <div id="panel">
+      <p>SHA256</p>
+    </div>
 
-    	<h1>My customized change to helloworld-ws</h1>
-    	<p>
-    	  The <i>helloworld-ws</i> quickstart demonstrates the use of <b>JAX-WS</b> in
-          Red Hat JBoss Enterprise Application Platform as a simple Hello World application.
-    	</p>
-    	<p>
-    	 There is no user interface for this quickstart. Instead, you can verify the
-         Web Service is running and deployed correctly by accessing the following URL:
-         </p>
-         <div style="margin-left: 1em;">
-         <a href="HelloWorldService?wsdl">HelloWorldService?wsdl</a>
-         </div>
-         <p>
-          This URL will display the WSDL definition for the deployed Web Service endpoint.
-    	</p>
+    <p style="text-align: center">If you have just deployed a new version of the app, please be patient. Wait a couple of minutes. The app should be given a breath. :)</p>
+    <p style="text-align: center">And of course, don't forget to refresh the page. It's just html)</p>
+    
+    <script>
+      function myFunction() {
+      document.getElementById("panel").style.display = "block";
+      }
+    </script>
     </body>
-
 </html>

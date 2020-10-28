@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-helloworld
+  namespace: default
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /helloworld-ws/
+spec:
+  tls:
+    - hosts:
+        - helloworld-izaitsava.k8s.izaitsava.playpit.by
+      secretName: my-secret3
+  rules:
+    - host: helloworld-izaitsava.k8s.izaitsava.playpit.by
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: docker-service
+              servicePort: 80
