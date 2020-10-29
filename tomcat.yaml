@@ -32,11 +32,11 @@ spec:
         readinessProbe:
           httpGet:
             port: 8080
-            path: /helloworld-ws/
+            path: /
         livenessProbe:
           httpGet:
             port: 8080
-            path: /helloworld-ws/
+            path: /
       imagePullSecrets:
       - name: regcred
 
