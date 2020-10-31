@@ -1,3 +1,5 @@
+@Library('jenkins-pipeline-shared-lib')_
+
 // Variables
 def git_app_source = 'git@github.com:MNT-Lab/build-t00ls.git'
 def git_credentials = 'github-ssh-key'
@@ -15,50 +17,6 @@ def kubernetes_namespace = 'namespace.yml'
 def kubernetes_app = 'helloworld-imelnik.yml'
 env.student = 'imelnik'
 env.workdir = 'helloworld-project/helloworld-ws'
-
-// Try catch stage block
-def mystage(String stageName, Closure body) {
-    stage (stageName) {
-        try {
-            body()
-        }
-        catch (err) {
-            def now = new Date()
-            env.TIMESTAMP = now.format('HH:mm:ss  dd.MM.yy', TimeZone.getTimeZone('UTC')).toString()
-            env.GLOBAL_STAGE_NAME = stageName
-            wrap([$class: 'BuildUser']) {
-                jobUserEmail = "${BUILD_USER_EMAIL}"
-            }
-            emailext (
-                subject: "FAILED: Job:${env.JOB_NAME}, BUILD_NUMBER:${env.BUILD_NUMBER}",
-                body: """<p>FAILED: Job:${env.JOB_NAME}, BUILD_NUMBER:${env.BUILD_NUMBER}</p>
-                    <p>Check console output at ${env.BUILD_URL}</p>
-                    <p>Failed stage: ${GLOBAL_STAGE_NAME}</p>
-                    <p>Reason: ${err}</p>
-                    <p>Timestamp (UTC): ${TIMESTAMP}</p>""",
-                to: "${jobUserEmail}",
-                mimeType: 'text/html')
-            throw err
-        }
-    }
-}
-
-// Upload to nexus
-def nexus3upload(String artifactname, String nexus, String credentials, String repository) {
-    sh "tar -zcvf ${artifactname} ${workdir}/target/helloworld-ws.war Jenkinsfile output.txt"
-    nexusArtifactUploader artifacts: [[
-            artifactId: pom.artifactId,
-            classifier: '',
-            file: "${artifactname}",
-            type: 'tar.gz']],
-            credentialsId: "${credentials}",
-            groupId: pom.parent.groupId,
-            nexusUrl: "${nexus}",
-            nexusVersion: 'nexus3',
-            protocol: 'https',
-            repository: "${repository}",
-            version: "$pom.parent.version-${BUILD_NUMBER}"
-}
 
 // Main
 node('k8s-jenkins-slave') {
@@ -89,8 +47,8 @@ node('k8s-jenkins-slave') {
         mystage('Sonar scan') {
             def scannerHome = tool sonar_scanner
             withSonarQubeEnv(sonarqubeenv) {
-                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=module10 \
-                -Dsonar.projectName=module10 \
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${student} \
+                -Dsonar.projectName=${student} \
                 -Dsonar.sources=${workdir} \
                 -Dsonar.java.binaries=${workdir}/target"
             }
@@ -118,9 +76,7 @@ node('k8s-jenkins-slave') {
             projectName: "MNTLAB-${student}-child1-build-job")
         }
         mystage('Packaging and Publishing results') {
-            // Read POM xml file using 'readMavenPom' step , this step 'readMavenPom' is included in: https://plugins.jenkins.io/pipeline-utility-steps
-            pom = readMavenPom file: "${workdir}/pom.xml"
-            nexus3upload( "pipeline-${student}-${BUILD_NUMBER}.tar.gz", nexus_url, nexus_credentials, nexus_repository)
+            nexus3upload( "${workdir}/pom.xml", "pipeline-${student}-${BUILD_NUMBER}.tar.gz", nexus_url, nexus_credentials, nexus_repository)
             withDockerRegistry(credentialsId: nexus_credentials, toolName: docker, url: "https://${docker_registry}") {
                 sh """docker build -t ${docker_registry}/helloworld-${student}:${BUILD_NUMBER} ./${workdir}
                 docker push ${docker_registry}/helloworld-${student}:${BUILD_NUMBER}
