@@ -23,7 +23,7 @@ spec:
         app: helloworld-wc
     spec:
       containers:
-      - image: docker.k8s.dkramich.playpit.by/helloworld-dkramich:"${env.NBUILD}"
+      - image: docker.k8s.dkramich.playpit.by/helloworld-dkramich:${BUILD_NUMBER}
         name: webapp
         ports: 
           - containerPort: 8080
