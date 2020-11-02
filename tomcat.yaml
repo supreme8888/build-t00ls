@@ -23,7 +23,7 @@ spec:
         app: tomcat
     spec:
       containers:
-      - image: nexus-docker.k8s.vsakhonchik.playpit.by/docker_tomcat:custom
+      - image: nexus-docker.k8s.vsakhonchik.playpit.by/helloworld-vsakhonchik:custom
         ports: 
           - containerPort: 8080
             protocol: TCP
